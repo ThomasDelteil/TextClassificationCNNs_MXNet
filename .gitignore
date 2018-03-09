@@ -4,3 +4,5 @@ __pycache__
 .ipynb_checkpoints/
 *.pkl
 crepe_epoch*
+.idea
+mms_app.log*

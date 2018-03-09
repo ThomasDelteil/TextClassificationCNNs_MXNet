@@ -1,8 +1,6 @@
-
-# Crepe model implementation with MXNet/Gluon
-
 **This is an automated Markdown generation from the notebook 'Crepe-Gluon.ipynb'**
 
+# Crepe model implementation with MXNet/Gluon
 
 This is an implementation of [the crepe mode, Character-level Convolutional Networks for Text Classification](https://arxiv.org/abs/1509.01626) using the MXNet Gluon API.
 
@@ -161,19 +159,6 @@ data.head()
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">

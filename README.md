@@ -1,4 +1,4 @@
-**This is an automated Markdown generation from the notebook 'Crepe-Gluon.ipynb'**
+**This is an automated Markdown generation from the notebook '[Crepe-Gluon.ipynb](https://github.com/ThomasDelteil/CNN_NLP_MXNet/blob/master/Crepe-Gluon.ipynb)'**
 
 # Crepe model implementation with MXNet/Gluon
 
@@ -101,11 +101,6 @@ def get_dataframe(path, num_lines):
 
     return pd.DataFrame.from_dict(df, orient='index')
 ```
-
-    /home/ec2-user/anaconda3/envs/mxnet_p36/lib/python3.6/site-packages/matplotlib/__init__.py:962: UserWarning: Duplicate key in file "/home/ec2-user/.config/matplotlib/matplotlibrc", line #2
-      (fname, cnt))
-    /home/ec2-user/anaconda3/envs/mxnet_p36/lib/python3.6/site-packages/matplotlib/__init__.py:962: UserWarning: Duplicate key in file "/home/ec2-user/.config/matplotlib/matplotlibrc", line #3
-      (fname, cnt))
 
 
 For each category we load MAX_ITEMS_PER_CATEGORY by randomly sampling the files and shuffling
@@ -438,10 +433,6 @@ for e in range(start_epoch, number_epochs):
 
 
 
-```python
-# clear the shared memory
-!rm -rf /dev/shm/*
-```
 
 ### Export to the symbolic format
 

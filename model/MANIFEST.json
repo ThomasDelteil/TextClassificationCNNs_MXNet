@@ -1,0 +1,18 @@
+{
+    "Model-Archive-Version": 0.1,
+    "Model-Archive-Description": "crepe_cnn",
+    "License": "Apache 2.0",
+    "Model-Server": 0.1,
+    "Model": {
+        "Symbol": "crepe-symbol.json",
+        "Parameters": "crepe-0000.params",
+        "Signature": "signature.json",
+        "Service": "crepe_cnn_service.py",
+        "Description": "crepe_cnn",
+        "Model-Name": "crepe_cnn",
+        "Model-Format": "MXNet-Symbolic"
+    },
+    "Engine": {
+        "MXNet": 0.12
+    }
+}

@@ -1,0 +1,6 @@
+data/*
+model/crepe_cnn
+__pycache__
+.ipynb_checkpoints/
+*.pkl
+crepe_epoch*

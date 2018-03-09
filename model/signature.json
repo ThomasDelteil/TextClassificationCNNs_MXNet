@@ -1,0 +1,16 @@
+{
+  "inputs": [
+    {
+      "data_name": "data",
+      "data_shape": [1, 69, 1014]
+    }
+  ],
+  "input_type": "application/json",
+  "outputs": [
+    {
+      "data_name": "hybridsequential0_dense2_fwd",
+      "data_shape": [1, 7]
+    }
+  ],
+  "output_type": "application/json"
+}

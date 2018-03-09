@@ -1,8 +1,9 @@
 **This is an automated Markdown generation from the notebook '[Crepe-Gluon.ipynb](https://github.com/ThomasDelteil/CNN_NLP_MXNet/blob/master/Crepe-Gluon.ipynb)'**
 
+
 # Crepe model implementation with MXNet/Gluon
 
-This is an implementation of [the crepe mode, Character-level Convolutional Networks for Text Classification](https://arxiv.org/abs/1509.01626) using the MXNet Gluon API.
+This is an implementation of [the crepe mode, Character-level Convolutional Networks for Text Classification](https://arxiv.org/abs/1509.01626) using the MXNet Gluon API. This tutorial is inspired by this [ilkarman/NLP-Sentiment](https://github.com/ilkarman/NLP-Sentiment)
 
 We are going to perform a **text classification** task, trying to classify Amazon reviews according to the product category they belong to.
 

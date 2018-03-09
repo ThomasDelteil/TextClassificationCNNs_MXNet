@@ -33,7 +33,7 @@ class TextClassicationService(MXNetBaseService):
     def _postprocess(self, data):
         data = data[0]
         softmax = nd.exp(data) / nd.sum(nd.exp(data))[0]
-        values = {val: float(int(softmax[0][i].asnumpy()*1000)/1000) for i, val in enumerate(self.labels)}
+        values = {val: float(int(softmax[0][i].asnumpy()*1000)/1000.0) for i, val in enumerate(self.labels)}
         index = int(nd.argmax(data, axis=1).asnumpy()[0])
         predicted = self.labels[index]
         return {'predicted':predicted, 'confidence':values}

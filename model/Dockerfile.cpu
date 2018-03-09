@@ -1,0 +1,11 @@
+FROM awsdeeplearningteam/mms_cpu:latest
+
+COPY crepe_cnn.model /models/
+
+COPY crepe_cnn_service.py mms_app_cpu.conf /models/
+
+ENV PATH="/mxnet_model_server:${PATH}" MXNET_MODEL_SERVER_GPU_IMAGE=0
+
+ENTRYPOINT ["mxnet-model-server.sh", "start", "--mms-config", "/models/mms_app_cpu.conf"]
+
+LABEL maintainer="thomasdelteil:github"

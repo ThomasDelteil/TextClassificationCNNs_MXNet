@@ -1,7 +1,7 @@
 var myApp = angular.module('myApp', []);
 myApp.controller('AppController', ['$scope', '$http', '$httpParamSerializerJQLike', function ($scope, $http, $httpParamSerializerJQLike) {
 
-    $scope.text = "Cloud Atlas is a very interesting piece. I really like the adaptation, it respects the format and the atmosphere of the book.";
+    $scope.text = "Dr. Bishop is one of the brightest minds working in the field of pattern recognition and machine learning. This book, appropriate for study at the advanced undergraduate level, discusses the major topics and techniques.";
 
     $scope.catModels = ['crepe'];
     

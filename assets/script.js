@@ -50,7 +50,7 @@ myApp.controller('AppController', ['$scope', '$http', '$httpParamSerializerJQLik
                 $http({
                     method: 'POST',
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                    url: 'http://ECS-first-run-alb-1884529755.us-east-2.elb.amazonaws.com/CREPE/predict',
+                    url: 'https://thdelteil.azurewebsites.net/CREPE/predict',
                     data: $httpParamSerializerJQLike({data: JSON.stringify([$scope.text])})
             }).then(function successCallback(response) {
                 var scores = response.data.prediction.confidence;

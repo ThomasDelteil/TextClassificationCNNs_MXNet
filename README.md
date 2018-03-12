@@ -1,11 +1,24 @@
 **This is an automated Markdown generation from the notebook '[Crepe-Gluon.ipynb](https://github.com/ThomasDelteil/CNN_NLP_MXNet/blob/master/Crepe-Gluon.ipynb)'**
 
 
-# Crepe model implementation with MXNet/Gluon
+# Character-level Convolutional Networks for text Classification
 
-This is an implementation of [the crepe mode, Character-level Convolutional Networks for Text Classification](https://arxiv.org/abs/1509.01626) using the MXNet Gluon API. This tutorial is inspired by this one [ilkarman/NLP-Sentiment](https://github.com/ilkarman/NLP-Sentiment)
+## Crepe model implementation with MXNet/Gluon
+
+This is an implementation of [the crepe mode, Character-level Convolutional Networks for Text Classification](https://arxiv.org/abs/1509.01626) using the MXNet Gluon API. That this is the paper we reference throughout the tutorial
 
 We are going to perform a **text classification** task, trying to classify Amazon reviews according to the product category they belong to.
+
+## Install Guide
+You need to install [Apache MXNet](http://mxnet.incubator.apache.org/) in order to run this tutorial. The following lines should work in most platform but checkout the [Apache install](http://mxnet.incubator.apache.org/install/index.html) guide for more info, especially if you plan to use GPU
+
+
+```python
+# GPU install
+!pip install mxnet-cu90 pandas -q
+# CPU install
+#!pip install mxnet pandas -q
+```
 
 ## Data download
 The dataset has been made available on this website: http://jmcauley.ucsd.edu/data/amazon/, citation of relevant papers:
@@ -42,30 +55,16 @@ categories = [
 for category in categories:
     print(category)
     url = base_url+prefix+category+suffix
-    !wget -P $folder $url -nc
+    !wget -P $folder $url -nc -nv
 ```
 
     Home_and_Kitchen
-    File ‘data/reviews_Home_and_Kitchen_5.json.gz’ already there; not retrieving.
-    
     Books
-    File ‘data/reviews_Books_5.json.gz’ already there; not retrieving.
-    
     CDs_and_Vinyl
-    File ‘data/reviews_CDs_and_Vinyl_5.json.gz’ already there; not retrieving.
-    
     Movies_and_TV
-    File ‘data/reviews_Movies_and_TV_5.json.gz’ already there; not retrieving.
-    
     Cell_Phones_and_Accessories
-    File ‘data/reviews_Cell_Phones_and_Accessories_5.json.gz’ already there; not retrieving.
-    
     Sports_and_Outdoors
-    File ‘data/reviews_Sports_and_Outdoors_5.json.gz’ already there; not retrieving.
-    
     Clothing_Shoes_and_Jewelry
-    File ‘data/reviews_Clothing_Shoes_and_Jewelry_5.json.gz’ already there; not retrieving.
-    
 
 
 ## Data Pre-processing
@@ -115,6 +114,8 @@ except:
     data = None
 ```
 
+If the data is not available in the pickled file, we create it from scratch
+
 
 ```python
 if data is None:
@@ -137,11 +138,12 @@ Let's visualize the data:
 
 
 ```python
-print(data['Y'].value_counts())
+print('Value counts:\n',data['Y'].value_counts())
 data.head()
 ```
 
-    1.0    250000
+    Value counts:
+     1.0    250000
     6.0    250000
     5.0    250000
     3.0    250000
@@ -166,27 +168,27 @@ data.head()
   <tbody>
     <tr>
       <th>0</th>
-      <td>Love these! | Love these for microwave use and...</td>
+      <td>Why didnt I find this sooner!!! | This product...</td>
       <td>0.0</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>The Unholy Trinity of 1986, Part 1.  It's rain...</td>
+      <td>The only thing weighing it down is the second ...</td>
       <td>2.0</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>My favorite Disney Movie! | I love the scene w...</td>
-      <td>3.0</td>
+      <td>Good | Works very good with a patch pulled or ...</td>
+      <td>5.0</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>Dashboard Universal Car Mount holder - Perfect...</td>
-      <td>4.0</td>
+      <td>Good mirror glasses | These are very reflectiv...</td>
+      <td>6.0</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>Great :) | Great for crop tops and other belly...</td>
+      <td>cute, cushy, too small :( | Well, here's anoth...</td>
       <td>6.0</td>
     </tr>
   </tbody>
@@ -207,9 +209,15 @@ import numpy as np
 import multiprocessing
 ```
 
+    /home/ec2-user/anaconda3/lib/python3.6/site-packages/urllib3/contrib/pyopenssl.py:46: DeprecationWarning: OpenSSL.rand is deprecated - you should use os.urandom instead
+      import OpenSSL.SSL
+
+
+Setting up the parameters for the network
+
 
 ```python
-ALPHABET = list("abcdefghijklmnopqrstuvwxyz0123456789-,;.!?:'\"/\\|_@#$%^&*~`+ =<>()[]{}")
+ALPHABET = list("abcdefghijklmnopqrstuvwxyz0123456789-,;.!?:'\"/\\|_@#$%^&*~`+ =<>()[]{}") # The 69 characters as specified in the paper
 ALPHABET_INDEX = {letter: index for index, letter in enumerate(ALPHABET)} # { a: 0, b: 1, etc}
 FEATURE_LEN = 1014 # max-length in characters for one document
 BATCH_SIZE = 128 # number of documents per batch
@@ -223,11 +231,18 @@ WDECAY = 0.00001 # regularization term to limit size of weights
 NUM_WORKERS = multiprocessing.cpu_count() # number of workers used in the data loading
 ```
 
+According to the paper, each document needs to be encoded in the following manner:
+    - Truncate to 1014 characters
+    - Reverse the string
+    - One-hot encode based on the alphabet
+    
+The following `encode` function does this for us
+
 
 ```python
 def encode(text):
     encoded = np.zeros([len(ALPHABET), FEATURE_LEN], dtype='float32')
-    review = text.lower()[::-1]
+    review = text.lower()[:FEATURE_LEN-1:-1]
     i = 0
     for letter in text:
         if i >= FEATURE_LEN:
@@ -238,22 +253,31 @@ def encode(text):
     return encoded
 ```
 
+The MXNet DataSet and DataLoader API lets you create different worker to pre-fetch the data and encode it the way you want, in order to prevent your GPU from starving
+
 
 ```python
 class AmazonDataSet(ArrayDataset):
     # We pre-process the documents on the fly
     def __getitem__(self, idx):
         return encode(self._data[0][idx]), self._data[1][idx]
-        
 ```
+
+We split our data into a training and a testing dataset
 
 
 ```python
 split = 0.8
 split_index = int(split*len(data)/BATCH_SIZE)*BATCH_SIZE
-train_dataset = AmazonDataSet(data['X'][:split_index].as_matrix(),data['Y'][:split_index].as_matrix())
-test_dataset = AmazonDataSet(data['X'][split_index:].as_matrix(),data['Y'][split_index:].as_matrix())
+train_data_X = data['X'][:split_index].as_matrix()
+train_data_Y = data['Y'][:split_index].as_matrix()
+test_data_X = data['X'][split_index:].as_matrix()
+test_data_Y = data['Y'][split_index:].as_matrix()
+train_dataset = AmazonDataSet(train_data_X, train_data_Y)
+test_dataset = AmazonDataSet(test_data_X, test_data_Y)
 ```
+
+Creating the training and testing dataloader, with NUM_WORKERS set to the number of CPU core
 
 
 ```python
@@ -262,15 +286,25 @@ train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=BATCH_SIZE
 
 
 ```python
-test_dataloader = DataLoader(test_dataset, shuffle=True, batch_size=BATCH_SIZE*6, num_workers=NUM_WORKERS*2)
+test_dataloader = DataLoader(test_dataset, shuffle=True, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS)
 ```
 
 ## Creation of the network
 
+The context will define where the training takes place, on the CPU or on the GPU
+
 
 ```python
-ctx = mx.gpu() # use ctx = mx.cpu() to run on CPU
+# ctx = mx.cpu()
+ctx = mx.gpu() # to run on GPU
 ```
+
+We create the network following the instructions describe in the paper, using the small feature and small output units configuration
+
+![img](data/diagram.png)
+![img](data/convolutional_layers.png)
+![img](data/dense_layer.png)
+
 
 
 ```python
@@ -318,6 +352,8 @@ print(net)
     )
 
 
+Here we define whether we load a pre-trained version of the model and [hybridize the network](https://mxnet.incubator.apache.org/tutorials/gluon/hybrid.html) for speed improvements
+
 
 ```python
 hybridize = True # for speed improvement, compile the network but no in-depth debugging possible
@@ -343,6 +379,8 @@ if hybridize:
 ```
 
 ### Softmax cross-entropy Loss
+
+We are in a multi-class classification problem, so we use the [Softmax Cross entropy loss](https://deepnotes.io/softmax-crossentropy)
 
 
 ```python
@@ -372,12 +410,15 @@ def evaluate_accuracy(data_iterator, net):
         prediction = nd.argmax(output, axis=1)
 
         if (i%50 == 0):
-            print("Samples {}".formaat(i*len(data)))
+            print("Samples {}".format(i*len(data)))
         acc.update(preds=prediction, labels=label)
     return acc.get()[1]
 ```
 
 ### Training Loop
+We loop through the batches given by the data_loader. These batches have been asynchronously fetched by the workers.
+
+After an epoch, we measure the test_accuracy and save the parameters of the model
 
 
 ```python
@@ -410,39 +451,32 @@ for e in range(start_epoch, number_epochs):
     print("Epoch %s. Loss: %s, Test_acc %s" % (e, moving_loss, test_accuracy))
 ```
 
-    Batch 0:0.15787965059280396,0.15787965059280396
-    Batch 50:0.10220436751842499,0.15457812894300896
-    Batch 100:0.17303970456123352,0.15119215689855275
-    Batch 150:0.2697896361351013,0.1522699015862132
-    Batch 200:0.21811547875404358,0.1475157505321016
-    Batch 250:0.09753967821598053,0.14239624025142694
-    Batch 300:0.14830192923545837,0.14575528771982066
-    Batch 350:0.18873190879821777,0.15026100733316544
-    Batch 400:0.11522325873374939,0.14915754813674642
-    Batch 450:0.15397216379642487,0.14515570012827422
-    Batch 500:0.12619560956954956,0.13938639690421473
-    Batch 0
-    Batch 50
-    Batch 100
-    Batch 150
-    Batch 200
-    Batch 250
-    Batch 300
-    Batch 350
-    Batch 400
-    Epoch 6. Loss: 0.139386396904, Test_acc 0.932054561709
 
-
+    Samples 288000
+    Samples 294400
+    Samples 300800
+    Samples 307200
+    Samples 313600
+    Samples 320000
+    Samples 326400
+    Samples 332800
+    Epoch 6. Loss: 0.208511839838, Test_acc 0.928448980435
 
 
 ### Export to the symbolic format
+The `save_params()` method works for models trained in Gluon. 
+
+However the `export()` function, exports it to a format usable in the symbolic API.
+We need the symbolic API in order to make it compatible with the current version of MXNet Model Server, for deployment purposes
 
 
 ```python
-#net.export('model/crepe')
+net.export('model/crepe')
 ```
 
 ### Random testing
+
+Let's randomly pick a few reviews and see how the classifier does!
 
 
 ```python
@@ -461,17 +495,18 @@ else:
       print('Incorrectly predicted {}'.format(predicted))
 ```
 
-    Great Phones, great price! | I like these headphones a lot. The service was fast, the product came exactly when expected.Overall one does have to get used to the noise cancellation aspect of these phones, because it really does work. Aside from the adjustment to these, they work fantastic!
-    Category: Cell_Phones_and_Accessories
+    Irreconcilable Similarities | There are several excellent books already in print by or about Richard M. Nixon and/or Henry A. Kissinger, notably Memoirs of Richard Nixon and Richard Reeves' President Nixon: Alone in the White House as well as Walter Isaacson's biography of Kissinger and The Kissinger Transcripts: The Top-Secret Talks With Beijing and Moscow. However, with access to a wealth of sources previously unavailable, Robert Dallek has written what will probably remain for quite some time the definitive study of one of U.S. history's most fascinating political partnerships.I defer to other reviewers to suggest parallels between the wars in Viet Nam and Iraq, especially when citing this passage in Dallek's Preface: "Arguments about the wisdom of the war in Iraq and how to end the U.S. involvement there, relations with China and Russia, what to do about enduring Mideast trensions between Israelis and Arabs, and the advantages and disadvantages of an imperial presidency can, I believe, be usefully considered in the context of a fresh look ast Nixon and Kissinger and the power they wielded for good and ill."Until reading Dallek's book, I was unaware of the nature and extent of what Nixon and Kissinger shared in common. Of greatest interest to me was the almost total absence of trust in others (including each other) as, separately and together, they sought to increase their power, influence, and especially, their prestige. In countless ways, they were especially petty men and, when perceiving a threat, could be vindictive. They seemed to bring out the worst qualities in each other, as during their self-serving collaboration on policies "good and ill" in relationships with other countries such as China, Russia, Viet Nam, Pakistan, and Chile. Neither seemed to have must interest in domestic affairs (except for perceived threats to their respective careers) and Nixon once characterized them as "building outhouses in Peoria."According to Dallek, "Nixon's use of foreign affairs to overcome impeachment threats in 1973-1974 are a distubring part of the administration's history. Its impact on policy deserves particular consideration, as does the more extensive use of international relations to serve domestic political goals throughout Nixon's presidency. Nixon's competence to lead the country during his impeachment cruisis also requires the closest possible scrutiny."Most experts on this troubled period agree that the ceasefire agreement with North Viet Nam in 1973 was essentially the same as one that could have been concluded years before. However, both Nixon and Kissinger waited until after Nixon's re-election in1972 before ending a war that (by1966) Kissinger had characterized as "unwinnable." According to Dallek, with access to 2,800 hours of Nixon tapes and 20,000 pages of Kissinger telephone transcripts, Kissinger would "say almost anything privately to Nixon in the service of his ambition." Nixon referred to opponents of the war as "communists." As the Watergate crisis intensified, Meanwhile, Kissinger conducted press briefings that were "part reality, part fantasy, and part deception" and referred to Democratic senators critical of the administration as "traitors."Although they were in constant collaboration until Nixon's resignation, Nixon and Kissinger were never very close. Anti-Semitic elements in Nixon's personality have been well-documented and certainly had some influence on his attitude toward Kissinger. At one point, he recommended (through John Ehrlichman) that Kissinger needed psychiatric therapy and should obtain it. Kissinger frequently referred to Nixon as "the meatball mind," "our drunken friend," and "That madman." It is certainly discomforting to realize that these two men, working together over a period of several years, made decisions and pursued policies that affected hundreds of millions of people throughout the world, "for good and ill."I am now eager to read two other books (soon to be published) that may perhaps provide new insights and additional information about a political partnership that was probably doomed from the beginning because of so many irreconcilable similarities. Specifically Elizabeth Drew's Richard Nixon (part of "The American Presidents" series) and Jeremi Suri's Henry Kissinger and the American Century. However, I think Dallek's probing analysis will remain the definitive source of whatever can be known about these "partners in power."
+    Category: Books
     Correct
 
 
 ### Manual Testing
+We can also write our own reviews, encode them and see what the model predicts
 
 
 ```python
 review_title = "Good stuff"
-review = "This album is definitely above the previous one"
+review = "This album is definitely better than the previous one"
 ```
 
 
@@ -482,20 +517,29 @@ encoded = nd.array([encode(review + " | " + review_title)], ctx=ctx)
 output = net(encoded)
 softmax = nd.exp(output) / nd.sum(nd.exp(output))[0]
 predicted = categories[np.argmax(output[0].asnumpy())]
-print('Predicted: {}'.format(predicted))
+print('Predicted: {}\n'.format(predicted))
 for i, val in enumerate(categories):
     print(val, float(int(softmax[0][i].asnumpy()*1000)/10), '%')
 ```
 
     Good stuff
-    This album is definitely above the previous one
+    This album is definitely better than the previous one
     
     Predicted: CDs_and_Vinyl
+    
     Home_and_Kitchen 0.0 %
     Books 0.0 %
-    CDs_and_Vinyl 99.7 %
-    Movies_and_TV 0.1 %
-    Cell_Phones_and_Accessories 0.0 %
-    Sports_and_Outdoors 0.0 %
+    CDs_and_Vinyl 98.7 %
+    Movies_and_TV 0.8 %
+    Cell_Phones_and_Accessories 0.2 %
+    Sports_and_Outdoors 0.1 %
     Clothing_Shoes_and_Jewelry 0.0 %
 
+
+# Model Deployment
+
+Head over to the `model/` folder and have a look at the README.md to learn how you can deploy this pre-trained model to MXNet Model Server. You can then package the API in a docker container for cloud deployment!
+
+An interactive live demo is available [here](https://thomasdelteil.github.io/CNN_NLP_MXNet/)
+
+[![img](data/live_demo.png)](https://thomasdelteil.github.io/CNN_NLP_MXNet/)

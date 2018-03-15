@@ -1,13 +1,14 @@
 **This is an automated Markdown generation from the notebook '[Crepe-Gluon.ipynb](https://github.com/ThomasDelteil/CNN_NLP_MXNet/blob/master/Crepe-Gluon.ipynb)'**
 
-
 # Character-level Convolutional Networks for text Classification
 
 ## Crepe model implementation with MXNet/Gluon
 
-This is an implementation of [the crepe mode, Character-level Convolutional Networks for Text Classification](https://arxiv.org/abs/1509.01626) using the MXNet Gluon API. That this is the paper we reference throughout the tutorial
+This is an implementation of [the crepe model, Character-level Convolutional Networks for Text Classification](https://arxiv.org/abs/1509.01626) using the MXNet Gluon API. That this is the paper we reference throughout the tutorial
 
 We are going to perform a **text classification** task, trying to classify Amazon reviews according to the product category they belong to.
+
+This work is inspired from a previous collaborative work with [Ilia Karmanov and Miguel Fierro](https://github.com/ilkarman/NLP-Sentiment)
 
 ## Install Guide
 You need to install [Apache MXNet](http://mxnet.incubator.apache.org/) in order to run this tutorial. The following lines should work in most platform but checkout the [Apache install](http://mxnet.incubator.apache.org/install/index.html) guide for more info, especially if you plan to use GPU
@@ -43,7 +44,7 @@ prefix = 'reviews_'
 suffix = '_5.json.gz'
 folder = 'data'
 categories = [
-    'Home_and_Kitchen', 
+    'Home_and_Kitchen', ""
     'Books', 
     'CDs_and_Vinyl', 
     'Movies_and_TV', 
@@ -102,6 +103,11 @@ def get_dataframe(path, num_lines):
     return pd.DataFrame.from_dict(df, orient='index')
 ```
 
+    /home/ec2-user/anaconda3/lib/python3.6/site-packages/matplotlib/__init__.py:962: UserWarning: Duplicate key in file "/home/ec2-user/.config/matplotlib/matplotlibrc", line #2
+      (fname, cnt))
+    /home/ec2-user/anaconda3/lib/python3.6/site-packages/matplotlib/__init__.py:962: UserWarning: Duplicate key in file "/home/ec2-user/.config/matplotlib/matplotlibrc", line #3
+      (fname, cnt))
+
 
 For each category we load MAX_ITEMS_PER_CATEGORY by randomly sampling the files and shuffling
 
@@ -139,6 +145,8 @@ Let's visualize the data:
 
 ```python
 print('Value counts:\n',data['Y'].value_counts())
+for i,cat in enumerate(categories):
+    print(i, cat)
 data.head()
 ```
 
@@ -151,6 +159,13 @@ data.head()
     0.0    250000
     4.0    194439
     Name: Y, dtype: int64
+    0 Home_and_Kitchen
+    1 Books
+    2 CDs_and_Vinyl
+    3 Movies_and_TV
+    4 Cell_Phones_and_Accessories
+    5 Sports_and_Outdoors
+    6 Clothing_Shoes_and_Jewelry
 
 
 
@@ -220,15 +235,8 @@ Setting up the parameters for the network
 ALPHABET = list("abcdefghijklmnopqrstuvwxyz0123456789-,;.!?:'\"/\\|_@#$%^&*~`+ =<>()[]{}") # The 69 characters as specified in the paper
 ALPHABET_INDEX = {letter: index for index, letter in enumerate(ALPHABET)} # { a: 0, b: 1, etc}
 FEATURE_LEN = 1014 # max-length in characters for one document
-BATCH_SIZE = 128 # number of documents per batch
-NUM_FILTERS = 256 # number of convolutional filters per convolutional layer
-NUM_OUTPUTS = len(categories) # number of classes
-FULLY_CONNECTED = 1024 # number of unit in the fully connected dense layer
-DROPOUT_RATE = 0.5 # probability of node drop out
-LEARNING_RATE = 0.01 # learning rate of the gradient
-MOMENTUM = 0.9 # momentum of the gradient
-WDECAY = 0.00001 # regularization term to limit size of weights
 NUM_WORKERS = multiprocessing.cpu_count() # number of workers used in the data loading
+BATCH_SIZE = 128 # number of documents per batch
 ```
 
 According to the paper, each document needs to be encoded in the following manner:
@@ -268,7 +276,7 @@ We split our data into a training and a testing dataset
 
 ```python
 split = 0.8
-split_index = int(split*len(data)/BATCH_SIZE)*BATCH_SIZE
+split_index = int(split*len(data))
 train_data_X = data['X'][:split_index].as_matrix()
 train_data_Y = data['Y'][:split_index].as_matrix()
 test_data_X = data['X'][split_index:].as_matrix()
@@ -281,12 +289,12 @@ Creating the training and testing dataloader, with NUM_WORKERS set to the number
 
 
 ```python
-train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS)
+train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, last_batch='discard')
 ```
 
 
 ```python
-test_dataloader = DataLoader(test_dataset, shuffle=True, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS)
+test_dataloader = DataLoader(test_dataset, shuffle=True, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, last_batch='discard')
 ```
 
 ## Creation of the network
@@ -305,6 +313,19 @@ We create the network following the instructions describe in the paper, using th
 ![img](data/convolutional_layers.png)
 ![img](data/dense_layer.png)
 
+
+Based on the paper we set the following parameters:
+
+
+```python
+NUM_FILTERS = 256 # number of convolutional filters per convolutional layer
+NUM_OUTPUTS = len(categories) # number of classes
+FULLY_CONNECTED = 1024 # number of unit in the fully connected dense layer
+DROPOUT_RATE = 0.5 # probability of node drop out
+LEARNING_RATE = 0.01 # learning rate of the gradient
+MOMENTUM = 0.9 # momentum of the gradient
+WDECAY = 0.00001 # regularization term to limit size of weights
+```
 
 
 ```python
@@ -451,18 +472,6 @@ for e in range(start_epoch, number_epochs):
     print("Epoch %s. Loss: %s, Test_acc %s" % (e, moving_loss, test_accuracy))
 ```
 
-
-    Samples 288000
-    Samples 294400
-    Samples 300800
-    Samples 307200
-    Samples 313600
-    Samples 320000
-    Samples 326400
-    Samples 332800
-    Epoch 6. Loss: 0.208511839838, Test_acc 0.928448980435
-
-
 ### Export to the symbolic format
 The `save_params()` method works for models trained in Gluon. 
 
@@ -485,7 +494,7 @@ index = random.randint(1, len(data))
 review = data['X'][index]
 label = categories[int(data['Y'][index])]
 print(review)
-print('Category: {}'.format(label))
+print('\nCategory: {}\n'.format(label))
 encoded = nd.array([encode(review)], ctx=ctx)
 output = net(encoded)
 predicted = categories[np.argmax(output[0].asnumpy())]
@@ -495,8 +504,10 @@ else:
       print('Incorrectly predicted {}'.format(predicted))
 ```
 
-    Irreconcilable Similarities | There are several excellent books already in print by or about Richard M. Nixon and/or Henry A. Kissinger, notably Memoirs of Richard Nixon and Richard Reeves' President Nixon: Alone in the White House as well as Walter Isaacson's biography of Kissinger and The Kissinger Transcripts: The Top-Secret Talks With Beijing and Moscow. However, with access to a wealth of sources previously unavailable, Robert Dallek has written what will probably remain for quite some time the definitive study of one of U.S. history's most fascinating political partnerships.I defer to other reviewers to suggest parallels between the wars in Viet Nam and Iraq, especially when citing this passage in Dallek's Preface: "Arguments about the wisdom of the war in Iraq and how to end the U.S. involvement there, relations with China and Russia, what to do about enduring Mideast trensions between Israelis and Arabs, and the advantages and disadvantages of an imperial presidency can, I believe, be usefully considered in the context of a fresh look ast Nixon and Kissinger and the power they wielded for good and ill."Until reading Dallek's book, I was unaware of the nature and extent of what Nixon and Kissinger shared in common. Of greatest interest to me was the almost total absence of trust in others (including each other) as, separately and together, they sought to increase their power, influence, and especially, their prestige. In countless ways, they were especially petty men and, when perceiving a threat, could be vindictive. They seemed to bring out the worst qualities in each other, as during their self-serving collaboration on policies "good and ill" in relationships with other countries such as China, Russia, Viet Nam, Pakistan, and Chile. Neither seemed to have must interest in domestic affairs (except for perceived threats to their respective careers) and Nixon once characterized them as "building outhouses in Peoria."According to Dallek, "Nixon's use of foreign affairs to overcome impeachment threats in 1973-1974 are a distubring part of the administration's history. Its impact on policy deserves particular consideration, as does the more extensive use of international relations to serve domestic political goals throughout Nixon's presidency. Nixon's competence to lead the country during his impeachment cruisis also requires the closest possible scrutiny."Most experts on this troubled period agree that the ceasefire agreement with North Viet Nam in 1973 was essentially the same as one that could have been concluded years before. However, both Nixon and Kissinger waited until after Nixon's re-election in1972 before ending a war that (by1966) Kissinger had characterized as "unwinnable." According to Dallek, with access to 2,800 hours of Nixon tapes and 20,000 pages of Kissinger telephone transcripts, Kissinger would "say almost anything privately to Nixon in the service of his ambition." Nixon referred to opponents of the war as "communists." As the Watergate crisis intensified, Meanwhile, Kissinger conducted press briefings that were "part reality, part fantasy, and part deception" and referred to Democratic senators critical of the administration as "traitors."Although they were in constant collaboration until Nixon's resignation, Nixon and Kissinger were never very close. Anti-Semitic elements in Nixon's personality have been well-documented and certainly had some influence on his attitude toward Kissinger. At one point, he recommended (through John Ehrlichman) that Kissinger needed psychiatric therapy and should obtain it. Kissinger frequently referred to Nixon as "the meatball mind," "our drunken friend," and "That madman." It is certainly discomforting to realize that these two men, working together over a period of several years, made decisions and pursued policies that affected hundreds of millions of people throughout the world, "for good and ill."I am now eager to read two other books (soon to be published) that may perhaps provide new insights and additional information about a political partnership that was probably doomed from the beginning because of so many irreconcilable similarities. Specifically Elizabeth Drew's Richard Nixon (part of "The American Presidents" series) and Jeremi Suri's Henry Kissinger and the American Century. However, I think Dallek's probing analysis will remain the definitive source of whatever can be known about these "partners in power."
-    Category: Books
+    Fine Breadmaker | We have used this mainly for the standard and whole wheat modes.  Their recipes work fine; also fine with Pamela's bread mix.
+    
+    Category: Home_and_Kitchen
+    
     Correct
 
 
@@ -543,3 +554,4 @@ Head over to the `model/` folder and have a look at the README.md to learn how y
 An interactive live demo is available [here](https://thomasdelteil.github.io/CNN_NLP_MXNet/)
 
 [![img](data/live_demo.png)](https://thomasdelteil.github.io/CNN_NLP_MXNet/)
+

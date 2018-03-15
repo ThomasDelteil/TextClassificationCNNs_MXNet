@@ -4,7 +4,8 @@
 
 ## Crepe model implementation with MXNet/Gluon
 
-This is an implementation of [the crepe model, Character-level Convolutional Networks for Text Classification](https://arxiv.org/abs/1509.01626) using the MXNet Gluon API. That this is the paper we reference throughout the tutorial
+
+This is an implementation of [the crepe model, Character-level Convolutional Networks for Text Classification](https://arxiv.org/abs/1509.01626). That this is the paper we reference throughout the tutorial
 
 We are going to perform a **text classification** task, trying to classify Amazon reviews according to the product category they belong to.
 

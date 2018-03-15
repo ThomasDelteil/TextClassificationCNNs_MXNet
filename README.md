@@ -451,7 +451,6 @@ for e in range(start_epoch, number_epochs):
     for i, (review, label) in enumerate(train_dataloader):
         review = review.as_in_context(ctx)
         label = label.as_in_context(ctx)
-        output = net(review)
         with autograd.record():
             output = net(review)
             loss = softmax_cross_entropy(output, label)

@@ -1,5 +1,9 @@
 **This is an automated Markdown generation from the notebook '[Crepe-Gluon.ipynb](https://github.com/ThomasDelteil/CNN_NLP_MXNet/blob/master/Crepe-Gluon.ipynb)'**
 
+Slides available [here](https://www.slideshare.net/ThomasDelteil1/convolutional-neural-networks-and-natural-language-processing-90539354)
+
+Recordings available here, [part1](https://www.youtube.com/watch?v=RgIa3_BjGyk), [part2](https://www.youtube.com/watch?v=mN15vKIyfoA), [part3](https://www.youtube.com/watch?v=K120xBnY6OA).
+
 # Character-level Convolutional Networks for text Classification
 
 ## Crepe model implementation with MXNet/Gluon

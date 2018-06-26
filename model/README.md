@@ -14,7 +14,7 @@ mxnet-model-export --model-name crepe_cnn --model-path . --service-file-path cre
 
 To start the server run:
 ```
-mxnet-model-server --models CREPE=crepe_cnn.model --service "crepe_cnn_service.py"
+mxnet-model-server --models CREPE=crepe_cnn.model
 ```
 
 To test the API run

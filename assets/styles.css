@@ -101,7 +101,8 @@ h1 {
 #review_button {
     height:150px;
     padding:10px;
-    margin-top: 20px
+    margin-top: 20px;
+    cursor: pointer;
 }
 
 .category-box {

@@ -3,14 +3,30 @@ body {
 }
 
 .header {
-    margin:auto;
-    height: 70px;
-    background-color: #333333;
-    color: #eeeeee;
+    width: 100%;
     text-align: center;
-    padding-top:5px;
-    height: auto;
-    padding-bottom: 10px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    background-color: #006ea7;
+    color: white;
+}
+p, li {
+    font-size: 1.6rem;
+    font-weight: 400;
+    letter-spacing: 0.010em;
+    line-height: 1.6em;
+}
+
+p {
+
+}
+
+h1 {
+    font-size: 3.400rem;
+    font-weight: 400;
+    line-height: 4rem;
+    margin: 0;
+    padding: 0;
 }
 
 .col-xs-1 {
@@ -23,50 +39,141 @@ body {
 }
 
 .scoring-categories-section {
-        height:120px;
-        margin-top:30px;
+    margin-top:30px;
+    padding-left: 100px;
+    padding-right: 70px;
 }
 
 .content {
-    max-width: 1024px;
+    max-width: 800px;
     margin: auto;
 }
 
 .input-text {
     margin:auto;
-    width: 80%;
-    height: 100%;
+    width: 100%;
     font-size: 120%;
     display: block;
+    border-radius: 5px;
+    border-color: darkgray;
+}
+
+.row {
+    width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 .input-section {
-    width: 100%;
+    padding: 0;
+}
+
+.paragraph {
+    margin: 5px;
+    margin-top: 20px;
+}
+
+
+#youtube_video {
+    width: 70%;
+    height: 420px;
+    margin: auto;
+    display: block;
+    margin-top:30px;
+}
+
+
+#text_classification_logo {
+    height: 80px;
+    margin-right: 10px;
+    padding-bottom: 10px;
+}
+
+#logo_header {
+    height: 50px;
+}
+
+.first-row {
+    margin-top:30px;
+    margin-bottom:30px;
+}
+
+#review_button {
+    height:150px;
+    padding:10px;
+    margin-top: 20px
+}
+
+.category-box {
     height: 150px;
-    margin-top: 30px;
-    margin-bottom: 45px;
+    margin-bottom: 20px;
 }
 
-.scoring-negative {
-    float:left; 
-    height:100%;
-    color: white;
-    background-color:indianred;
-    text-align: left;
-    padding-left:5px;
-    min-width:4%;
-    max-width:96%;
+.category-text {
+    text-align: center;
+    margin-top: 5px;
+
+    font-size: 100%;
+    font-weight: 400;
+    line-height: 1.2;
 }
 
+.bar-container {
+    border: solid 1px mediumseagreen;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+@media (max-width: 600px) {
+    #youtube_video {
+        padding: 0;
+        height: 360px;
+        width: 100%;
+    }
+    .category-box {
+        margin-bottom: 0px;
+        padding: 5px;
+    }
+
+    .category-text {
+        font-size: 90%;
+    }
+
+    #review_button {
+        margin-top: 0px;
+    }
+    .first-row {
+        margin-top: 0px;
+        margin-bottom: 5px;
+    }
+
+    #text_classification_logo {
+        height: 50px;
+        margin-right: 3px;
+        padding-bottom: 10px;
+    }
+
+    .scoring-categories-section{
+        padding: 0;
+        margin-top: 5px;
+    }
+    #logo_header {
+        height: 30px;
+    }
+
+    h1 {
+        font-size: 175%;
+    }
+}
+
+.bold {
+    font-weight: bold;
+}
 .scoring-positive {
     float:right; 
     color: white;
-    height:100%;
     background-color:mediumseagreen;
     text-align: right;
-    padding-right:5px;
-    min-width:4%;
-    max-width:96%;
 }
 
 .scoring-bar {
@@ -78,6 +185,11 @@ body {
 .scoring-sentiment-section {
     margin: 20px;
     margin-top: 80px;
+}
+
+
+img {
+    vertical-align: middle;
 }
 
 div {

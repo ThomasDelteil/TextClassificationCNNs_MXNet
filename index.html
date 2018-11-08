@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title>Deep NLP</title>
+    <title>Text Classification MXNet</title>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-118968561-1"></script>
     <script>
@@ -14,8 +14,8 @@
 
     <script src="assets/angular.min.js"></script>
     <script src="assets/script.js"></script>
-    <link href="assets/styles.css" rel="stylesheet"/>
     <link href="assets/bootstrap.min.css" rel="stylesheet"/>
+    <link href="assets/styles.css" rel="stylesheet"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta property="og:title" content="Classify product reviews with Deep Learning and MXNet" />
     <meta property="og:type" content="article" />
@@ -29,72 +29,93 @@
 
 <body>
 <div class="header">
-    <h1>Text Classification with Deep Convolutional Neural Networks</h1>
-</div>
+        <h1>
+            <img id="text_classification_logo" src="assets/img/thinking.png">Text classification with
+            <a href="https://mxnet.io"><img id="logo_header" src="assets/img/mxnet_white.png"></a>
+        </h1>
+    </div>
 <div ng-app="myApp" class="content">
     <div ng-controller="AppController">
-        <div class="row">
-            <div class=col-xs-4>
-                <p style="margin-left: 5px; margin-top:30px">
-                    A <b>Convolutional Neural Network</b> has been trained on 1.4M Amazon reviews, belonging to 7
-                    categories,
-                    to predict what the category of a product is <b>based solely on its reviews</b>.
-                    You can try it live below, type a review for an hypothetical product and check the results!
-                </p>
+        <div class="row first-row">
+            <div class="col-md-4 col-xs-12" style="text-align:center">
+                <img ng-click="randomReview()" id="review_button" src="assets/img/random_review.png">
             </div>
-            <div class="input-section col-xs-8">
-                <textarea maxlength="1014" class="input-text" ng-model="text" ng-change="rescoreData()"></textarea>
+            <div class="input-section col-md-8 col-xs-12">
+                <span><i>write a review</i></span>
+                <textarea rows=7 maxlength="1014" class="input-text" ng-model="text" ng-change="rescoreData()"></textarea>
             </div>
         </div>
 
 
         <div class="scoring-categories-section">
-            <div class="col-xs-1" ng-repeat="(key, cat) in categories">
-                <div class="row">
-                    <img class="col-xs-12" src="{{cat.url}}">
-                </div>
-                <div class="row" style="min-height:55px;">
-                    <p style="text-align: center; margin-top: 5px; ">{{cat.title}}</p>
-                </div>
+            <div class="row">
+                <div class="col-xs-4 col-md-3 category-box" ng-repeat="(key, cat) in categories">
+                    <div class="row">
+                        <img class="col-xs-12" src="{{cat.url}}">
+                    </div>
+                    <div class="row bar-container">
+                        <div class="scoring-positive"
+                             style="height:5px; width:{{cat.score}}%; float:left;">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <p ng-class="key == predicted ? 'bold' : ''" class="category-text">{{cat.title}}</p>
+                    </div>
 
-                <div ng-if="cat.score['crepe'] > 3" class="scoring-positive"
-                     style="height:5px; width:{{cat.score['crepe']}}%; float:left; margin-top:10px">
                 </div>
             </div>
         </div>
 
-        <p style="margin-top:60px; margin-left:5px">
-            <br>
-            <br>
-            <b>Jupyter notebook</b>
-        </p>
-        <ul>
-            <li>To learn how to train a similar Convolutional Neural Network to perform text classification, follow <a
+        <div class="paragraph">
+            <p><b>What is this?</b></p>
+            <p>
+                It is text classification model, a <b>Convolutional Neural Network</b> has been trained on 1.4M Amazon reviews, belonging to 7
+                categories, to predict what the category of a product is <b>based solely on its reviews</b>.
+                You can try it live above, type your own review for an hypothetical product and check the results,
+                or pick a random review.
+            </p>
+        </div>
+
+        <div class="paragraph">
+            <p><b>How does it work?</b></p>
+            <ul>
+                <li>The characters of each review are one-hot encoded, and the review is represented as a matrix. This
+                review is passed through 1D (or temporal) convolutions and pooling layers all the way to a classification
+                step where the review is classified as one of the N categories</li>
+            </ul>
+            <img style="width:100%" src="assets/img/paperhd.png">
+            <p style="text-align:center; font-size: 80%;"><i>Source: <a href="https://arxiv.org/abs/1509.01626">Character-level Convolutional Networks for Text Classification</a></i></p>
+            <ul>
+                <li>Check this video series that explains what convolutions are and how to apply them to Natural Language Processing:</li>
+            </ul>
+            <iframe id="youtube_video" src="https://www.youtube.com/embed/videoseries?rel=0&autohide=1&showinfo=0&list=PLgPhPQP4hXnB1XPGNLijmuuY3axdZOkvE&" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""></iframe>
+
+        </div>
+
+        <div class="paragraph">
+            <p><b>Resources</b></p>
+
+            <li>You can <b>find the code to train the same model</b> to perform text classification with convolutional
+                    neural networks in <a
                     href="https://github.com/ThomasDelteil/CNN_NLP_MXNet">this interactive notebook</a></li>
-        </ul>
-        <p style="margin-left:5px">
-            <br>
-            <b>Additional Resources</b>
-        </p>
-        <ul>
-            <li><a href="http://mxnet.incubator.apache.org/">Apache MXNet official website</a></li>
-            <li><a href="http://mxnet.incubator.apache.org/tutorials/index.html">Apache MXNet tutorials</a></li>
-            <li>Learning Deep Learning with Apache MXNet/Gluon through interactive notebooks/textbook: <a
-                    href="https://github.com/zackchase/mxnet-the-straight-dope">MXNet, The straight dope</a></li>
-            <li>Serve deep learning models through an HTTP API using <a
-                    href="https://github.com/awslabs/mxnet-model-server">MXNet Model Server</a> and <a
-                    href="https://console.aws.amazon.com/ecs/home?region=us-east-1#/getStarted">AWS Elastic Container
-                Service</a></li>
-            <li>Earlier implementation of crepe using the Apache MXNet/Module API <a
-                    href="https://github.com/ilkarman/NLP-Sentiment/tree/master/mxnet">(github</a>, <a
-                    href="http://osdcwebappdeeplearning.azurewebsites.net">demo</a>, <a
-                    href="https://blogs.technet.microsoft.com/machinelearning/2017/02/13/cloud-scale-text-classification-with-convolutional-neural-networks-on-microsoft-azure/">blog
-                post)</a></li>
-        </ul>
-        <p style="margin-left:5px">
-            <br>
-            <b>Sources</b>
-        </p>
+                <li><a href="http://mxnet.incubator.apache.org/">Apache MXNet official website</a></li>
+                <li><a href="http://mxnet.incubator.apache.org/tutorials/index.html">Apache MXNet tutorials</a></li>
+                <li>Learning Deep Learning with Apache MXNet/Gluon through interactive notebooks/textbook: <a
+                        href="https://github.com/zackchase/mxnet-the-straight-dope">MXNet, The straight dope</a></li>
+                <li>Serve deep learning models through an HTTP API using <a
+                        href="https://github.com/awslabs/mxnet-model-server">MXNet Model Server</a> and <a
+                        href="https://console.aws.amazon.com/ecs/home?region=us-east-1#/getStarted">AWS Elastic Container
+                    Service</a></li>
+                <li>Earlier implementation of crepe using the Apache MXNet/Module API <a
+                        href="https://github.com/ilkarman/NLP-Sentiment/tree/master/mxnet">(github</a>, <a
+                        href="http://osdcwebappdeeplearning.azurewebsites.net">demo</a>, <a
+                        href="https://blogs.technet.microsoft.com/machinelearning/2017/02/13/cloud-scale-text-classification-with-convolutional-neural-networks-on-microsoft-azure/">blog
+                    post)</a></li>
+            </ul>
+        </div>
+
+        <div class="paragraph">
+            <p><b>References</b></p>
 			<ul>
 				<li><b>Paper:</b> Xiang Zhang, Junbo Zhao, Yann LeCun.<a href="https://arxiv.org/abs/1509.01626"> Character-level Convolutional Networks for Text Classification </a>. Advances in Neural Information Processing Systems 28 (NIPS 2015)
 				<li>Icons credits:
@@ -108,11 +129,10 @@
 					<li>Inferring networks of substitutable and complementary products. J. McAuley, R. Pandey, J. Leskovec. Knowledge Discovery and Data Mining, 2015</li>
 				</ul>
 			</ul>
-	    <a style="
-    float: right;
-" href="https://github.com/ThomasDelteil">
-<img src="https://avatars2.githubusercontent.com/u/3716307?s=460&amp;v=4" style="border-radius:50%; margin: 20px" width="50px" height="50px">Built by Thomas Delteil
-</a>
+        </div>
+	    <a style="float: right; margin-right:5px;" href="https://github.com/ThomasDelteil">
+            <img src="https://avatars2.githubusercontent.com/u/3716307?s=460&amp;v=4" style="border-radius:50%; margin: 20px" width="50px" height="50px">Built by Thomas Delteil
+        </a>
 
 
     </div>

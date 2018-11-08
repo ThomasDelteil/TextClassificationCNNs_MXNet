@@ -60,7 +60,7 @@ myApp.controller('AppController', ['$scope', '$http', '$httpParamSerializerJQLik
                 headers: {'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json'},
                 //url: 'https://api.thomasdelteil.com/predictions/crepe',
                 //data: $httpParamSerializerJQLike({"data": JSON.stringify([{"review":$scope.text,"review_title":""}])})
-                url: 'http://localhost:8081/CREPE/predict',
+                url: 'https://api.thomasdelteil.com/CREPE/predict',
                 data: $httpParamSerializerJQLike({data: JSON.stringify([$scope.text])})
             }).then(function successCallback(response) {
                 var scores = response.data.prediction.confidence;

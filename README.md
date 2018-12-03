@@ -1,5 +1,7 @@
 **This is an automated Markdown generation from the notebook '[Crepe-Gluon.ipynb](https://github.com/ThomasDelteil/CNN_NLP_MXNet/blob/master/Crepe-Gluon.ipynb)'**
 
+Check the live demo [here]!(https://thomasdelteil.github.io/TextClassificationCNNs_MXNet/)
+
 Slides available [here](https://www.slideshare.net/ThomasDelteil1/convolutional-neural-networks-and-natural-language-processing-90539354)
 
 Recordings available here, [part1](https://www.youtube.com/watch?v=RgIa3_BjGyk), [part2](https://www.youtube.com/watch?v=mN15vKIyfoA), [part3](https://www.youtube.com/watch?v=K120xBnY6OA).
@@ -557,5 +559,5 @@ Head over to the `model/` folder and have a look at the README.md to learn how y
 
 An interactive live demo is available [here](https://thomasdelteil.github.io/TextClassificationCNNs_MXNet/)
 
-[![img](data/live_demo.png)](https://thomasdelteil.github.io/TextClassificationCNNs_MXNet/)
+[![img](https://user-images.githubusercontent.com/3716307/48382335-6099ae00-e695-11e8-8110-f692b9ecb831.png)](https://thomasdelteil.github.io/TextClassificationCNNs_MXNet/)
 

@@ -555,7 +555,7 @@ for i, val in enumerate(categories):
 
 Head over to the `model/` folder and have a look at the README.md to learn how you can deploy this pre-trained model to MXNet Model Server. You can then package the API in a docker container for cloud deployment!
 
-An interactive live demo is available [here](https://thomasdelteil.github.io/CNN_NLP_MXNet/)
+An interactive live demo is available [here](https://thomasdelteil.github.io/TextClassificationCNNs_MXNet/)
 
-[![img](data/live_demo.png)](https://thomasdelteil.github.io/CNN_NLP_MXNet/)
+[![img](data/live_demo.png)](https://thomasdelteil.github.io/TextClassificationCNNs_MXNet/)
 
